@@ -1,5 +1,12 @@
 import { Paste } from "./types";
 
+// Extend the global object with proper typing
+declare global {
+  var mockStore:
+    | Map<string, { paste: Paste; expiresAt: number | null }>
+    | undefined;
+}
+
 // Check if we're in production with Redis configured
 const useRealRedis =
   process.env.KV_REST_API_URL && process.env.NODE_ENV === "production";
@@ -13,19 +20,15 @@ if (useRealRedis) {
   });
 }
 
-// Mock storage for development
-// @ts-ignore
+// Mock storage for development - properly typed
 if (!global.mockStore) {
-  // @ts-ignore
   global.mockStore = new Map<
     string,
     { paste: Paste; expiresAt: number | null }
   >();
 }
 
-// @ts-ignore
-const mockStore: Map<string, { paste: Paste; expiresAt: number | null }> =
-  global.mockStore;
+const mockStore = global.mockStore;
 
 const PASTE_PREFIX = "paste:";
 
